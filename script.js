@@ -119,15 +119,15 @@ function update() {
 }
 
 function moveDoodler(e) {
-    if (e.code == "ArrowRight" || e.code == "KeyD") { //move right
+    if (e.code === "ArrowRight" || e.code === "KeyD") { //move right
         velocityX = 4;
         doodler.img = doodlerRightImg;
     }
-    else if (e.code == "ArrowLeft" || e.code == "KeyA") { //move left
+    else if (e.code === "ArrowLeft" || e.code === "KeyA") { //move left
         velocityX = -4;
         doodler.img = doodlerLeftImg;
     }
-    else if (e.code == "Space" && gameOver) {
+    else if (e.code === "Space" && gameOver) {
         //reset
         doodler = {
             img : doodlerRightImg,
