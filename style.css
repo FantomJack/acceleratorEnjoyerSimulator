@@ -2,6 +2,7 @@ body {
     text-align: center;
     height: 100vh;
     margin: 0;
+    background-color: antiquewhite;
 }
 
 #board {
@@ -9,4 +10,5 @@ body {
     height: -webkit-fill-available;
     aspect-ratio: 360/576;
     margin: 1em;
+    outline: groove tan 0.2em;
 }

@@ -4,6 +4,10 @@ let boardWidth = 360;
 let boardHeight = 576;
 let context;
 
+//physics
+let gravity = 0.4;
+let lastPlatform;
+
 //doodler
 let doodlerWidth = 46;
 let doodlerHeight = 46;
@@ -16,16 +20,13 @@ let doodler = {
     img : null,
     x : doodlerX,
     y : doodlerY,
+    velocityLeft : 0,
+    velocityRight : 0,
+    velocityY : 0,
+    jumpV : -8,
     width : doodlerWidth,
     height : doodlerHeight
 }
-
-//physics
-let velocityXL = 0;
-let velocityXR = 0;
-let velocityY = 0; //doodler jump speed
-let jumpV = -8; //starting velocity Y
-let gravity = 0.4;
 
 //platforms
 let platformArray = [];
@@ -36,39 +37,30 @@ let platformImg;
 let gameOver = false;
 
 window.onload = function() {
+
+    loadImages();
+
     board = document.getElementById("board");
     console.log(board)
     board.height = boardHeight;
     board.width = boardWidth;
     context = board.getContext("2d"); //used for drawing on the board
 
-    //draw doodler
-    context.fillStyle = "green";
-    context.fillRect(doodler.x, doodler.y, doodler.width, doodler.height);
-
-    // load images
-    doodlerRightImg = new Image();
-    doodlerRightImg.src = "./doodler-right.png";
     doodler.img = doodlerRightImg;
+    doodler.velocityY = doodler.jumpV;
     doodlerRightImg.onload = function() {
         context.drawImage(doodler.img, doodler.x, doodler.y, doodler.width, doodler.height);
     }
 
-    doodlerLeftImg = new Image();
-    doodlerLeftImg.src = "./doodler-left.png";
 
-    platformImg = new Image();
-    platformImg.src = "./platform.png";
-
-    velocityY = jumpV;
     placePlatforms();
     requestAnimationFrame(update);
     document.addEventListener("keydown", moveDoodler);
     document.addEventListener("keyup", (e) => {
         if (e.code === "ArrowLeft" || e.code === "KeyA")
-            velocityXL = 0;
+            doodler.velocityLeft = 0;
         if (e.code === "ArrowRight" || e.code === "KeyD")
-            velocityXR = 0;
+            doodler.velocityRight = 0;
     });
 }
 
@@ -80,8 +72,8 @@ function update() {
     context.clearRect(0, 0, board.width, board.height);
 
     //doodler
-    doodler.x += velocityXL;
-    doodler.x += velocityXR;
+    doodler.x += doodler.velocityLeft;
+    doodler.x += doodler.velocityRight;
     if (doodler.x > boardWidth) {
         doodler.x = 0;
     }
@@ -89,8 +81,8 @@ function update() {
         doodler.x = boardWidth;
     }
 
-    velocityY += gravity;
-    doodler.y += velocityY;
+    doodler.velocityY += gravity;
+    doodler.y += doodler.velocityY;
     if (doodler.y > board.height) {
         gameOver = true;
     }
@@ -99,11 +91,11 @@ function update() {
     //platforms
     for (let i = 0; i < platformArray.length; i++) {
         let platform = platformArray[i];
-        if (velocityY < 0 && doodler.y < boardHeight*3/4) {
-            platform.y -= jumpV; //slide platform down
+        if (doodler.y < 0 && doodler.y < boardHeight*3/4) {
+            platform.y -= doodler.jumpV; //slide platform down
         }
-        if (detectCollision(doodler, platform) && velocityY >= 0) {
-            velocityY = jumpV; //jump
+        if (detectCollision(doodler, platform) && doodler.velocityY >= 0) {
+            doodler.y = doodler.jumpV; //jump
         }
         context.drawImage(platform.img, platform.x, platform.y, platform.width, platform.height);
     }
@@ -125,11 +117,11 @@ function update() {
 
 function moveDoodler(e) {
     if (e.code === "ArrowRight" || e.code === "KeyD") { //move right
-        velocityXR = 4;
+        doodler.velocityRight = 4;
         doodler.img = doodlerRightImg;
     }
     else if (e.code === "ArrowLeft" || e.code === "KeyA") { //move left
-        velocityXL = -4;
+        doodler.velocityLeft = -4;
         doodler.img = doodlerLeftImg;
     }
     else if (e.code === "Space" && gameOver) {
@@ -138,13 +130,14 @@ function moveDoodler(e) {
             img : doodlerRightImg,
             x : doodlerX,
             y : doodlerY,
+            velocityLeft : 0,
+            velocityRight : 0,
+            velocityY : doodler.jumpV,
+            jumpV : -8,
             width : doodlerWidth,
             height : doodlerHeight
         }
 
-        velocityXL = 0;
-        velocityXR = 0;
-        velocityY = jumpV;
         gameOver = false;
         placePlatforms();
     }
@@ -161,20 +154,10 @@ function placePlatforms() {
         width : platformWidth,
         height : platformHeight
     }
-
     platformArray.push(platform);
 
-    // platform = {
-    //     img : platformImg,
-    //     x : boardWidth/2,
-    //     y : boardHeight - 150,
-    //     width : platformWidth,
-    //     height : platformHeight
-    // }
-    // platformArray.push(platform);
-
     for (let i = 0; i < 6; i++) {
-        let randomX = Math.floor(Math.random() * boardWidth*3/4); //(0-1) * boardWidth*3/4
+        let randomX = Math.floor(Math.random() * boardWidth*3/4);
         let platform = {
             img : platformImg,
             x : randomX,
@@ -205,4 +188,16 @@ function detectCollision(a, b) {
         a.x + a.width > b.x &&   //a's top right corner passes b's top left corner
         a.y < b.y + b.height &&  //a's top left corner doesn't reach b's bottom left corner
         a.y + a.height > b.y;    //a's bottom left corner passes b's top left corner
+}
+
+function loadImages() {
+    // load images
+    doodlerRightImg = new Image();
+    doodlerRightImg.src = "./doodler-right.png";
+
+    doodlerLeftImg = new Image();
+    doodlerLeftImg.src = "./doodler-left.png";
+
+    platformImg = new Image();
+    platformImg.src = "./platform.png";
 }
