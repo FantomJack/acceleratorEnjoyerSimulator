@@ -40,6 +40,7 @@ let menu = false;
 let mobile = false;
 let hits = false;
 
+// FPS
 let now;
 let then;
 let elapsed;
@@ -74,13 +75,8 @@ window.onload = function() {
     fpsInterval = 1000 / fps;
     then = Date.now();
     requestAnimationFrame(frame);
-    document.addEventListener("keydown", moveDoodler);
-    document.addEventListener("keyup", (e) => {
-        if (e.code === "ArrowLeft" || e.code === "KeyA")
-            doodler.velocityLeft = 0;
-        if (e.code === "ArrowRight" || e.code === "KeyD")
-            doodler.velocityRight = 0;
-    });
+    document.addEventListener("keydown", buttonDown);
+    document.addEventListener("keyup", buttonUp);
 }
 
 function frame(){
@@ -146,7 +142,14 @@ function update() {
     }
 }
 
-function moveDoodler(e) {
+function buttonUp(e){
+    if (e.code === "ArrowLeft" || e.code === "KeyA")
+        doodler.velocityLeft = 0;
+    if (e.code === "ArrowRight" || e.code === "KeyD")
+        doodler.velocityRight = 0;
+}
+
+function buttonDown(e) {
 
     if (e.code === "ArrowRight" || e.code === "KeyD") { //move right
         doodler.velocityRight = 4;
@@ -208,12 +211,12 @@ function detectCollision(doodler, platform) {
 function loadImages() {
     // load images
     doodler.RightImg = new Image();
-    doodler.RightImg.src = "./doodler-right.png";
+    doodler.RightImg.src = "./assets/doodler-right.png";
 
     doodler.LeftImg = new Image();
-    doodler.LeftImg.src = "./doodler-left.png";
+    doodler.LeftImg.src = "./assets/doodler-left.png";
 
     platformImg = new Image();
-    platformImg.src = "./platform.png";
+    platformImg.src = "./assets/platform.png";
 }
 

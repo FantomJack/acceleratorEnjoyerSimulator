@@ -6,9 +6,15 @@ body {
 }
 
 #board {
-    background-image: url("./doodlejumpbg.png");
+    background-image: url("assets/doodlejumpbg.png");
     height: -webkit-fill-available;
     aspect-ratio: 360/576;
     margin: 1em;
     outline: groove tan 0.2em;
+}
+
+@media print {
+    .noPrint{
+        display: none;
+    }
 }
